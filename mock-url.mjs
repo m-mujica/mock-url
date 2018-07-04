@@ -10,6 +10,7 @@ mock-url .location {
     font-size: 20px;
 }
 mock-url .url {
+    font-family: system-ui;
     display: inline-block;
     border: solid 1px;
     padding: 2px 2px 2px 5px;
@@ -29,7 +30,7 @@ mock-url .back:hover, mock-url .forward:hover, mock-url .reload:hover, mock-url 
 }
 mock-url input {
     border: none;
-    font-size: 20;
+    font-size: 20px;
     background-color: #efefef;
 }
 `;
@@ -43,7 +44,7 @@ Component.extend({
             <span class='back' on:click='back()'>&#x21E6;</span>
             <span class='forward' on:click='forward()'>&#x21E8;</span>
             <span class='reload' on:click='reload()'>&#8635;</span>
-            <div class="url">URL: {{page}}<input value:bind="url"/></div>
+            <div class="url">URL: {{page}}<input value:bind="url" placeholder="#! The hash is empty"/></div>
         </div>`,
 
     ViewModel: DefineMap.extend("MockUrl",{
