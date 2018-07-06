@@ -11,9 +11,18 @@ mock-url .location {
 }
 mock-url .url {
     font-family: system-ui;
-    display: inline-block;
+    display: flex;
     border: solid 1px;
     padding: 2px 2px 2px 5px;
+    flex-grow: 1;
+    flex-direction: row;
+}
+mock-url .url .base {
+    flex-grow: 0;
+    line-height: 24px;
+    padding: 1px 0px;
+}
+mock-url .input {
     flex-grow: 1;
 }
 mock-url .back, mock-url .forward, mock-url .reload {
@@ -32,7 +41,9 @@ mock-url input {
     border: none;
     font-size: 20px;
     background-color: #efefef;
+    width: 100%;
 }
+
 `;
 
 document.body.appendChild(style);
@@ -44,7 +55,7 @@ Component.extend({
             <span class='back' on:click='back()'>&#x21E6;</span>
             <span class='forward' on:click='forward()'>&#x21E8;</span>
             <span class='reload' on:click='reload()'>&#8635;</span>
-            <div class="url">URL: {{page}}<input value:bind="url" placeholder="#! The hash is empty"/></div>
+            <div class="url"><span class='base'>URL: {{page}}</span><span class='input'><input value:bind="url" placeholder="#! The hash is empty"/></span></div>
         </div>`,
 
     ViewModel: DefineMap.extend("MockUrl",{
