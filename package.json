@@ -1,6 +1,6 @@
 {
   "name": "mock-url",
-  "version": "5.0.2",
+  "version": "5.0.3",
   "description": "",
   "main": "mock-url.mjs",
   "scripts": {
