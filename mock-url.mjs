@@ -1,5 +1,5 @@
 
-import { Component, DefineMap, stache } from "//unpkg.com/can@^5.0.0-pre.1/core.mjs";
+import { Component, DefineMap, stache } from "//unpkg.com/can@5/core.mjs";
 
 var style = document.createElement("style");
 style.innerHTML = `
@@ -19,6 +19,7 @@ mock-url .url {
 }
 mock-url .url .base {
     flex-grow: 0;
+    flex-shrink: 0;
     line-height: 24px;
     padding: 1px 0px;
 }
