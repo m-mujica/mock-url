@@ -1,4 +1,3 @@
-
 import { Component, DefineMap, stache } from "//unpkg.com/can@5/core.mjs";
 
 var style = document.createElement("style");
@@ -56,12 +55,41 @@ Component.extend({
             <span class='back' on:click='back()'>&#x21E6;</span>
             <span class='forward' on:click='forward()'>&#x21E8;</span>
             <span class='reload' on:click='reload()'>&#8635;</span>
-            <div class="url"><span class='base'>URL: {{page}}</span><span class='input'><input value:bind="url" placeholder="#! The hash is empty"/></span></div>
-        </div>`,
-
+            <div class="url">
+                <span class='base'>URL:{{page}}{{path}}</span>
+                <span class='input'><input value:bind="url" placeholder="#! The hash is empty"/></span>
+            </div>
+        </div>
+    `,
     ViewModel: DefineMap.extend("MockUrl",{
         page: {
             default: "/my-app.html"
+        },
+        path: {
+            value(prop) {
+                var pushState = window.history.pushState;
+                
+                // prevent history.pushState from refreshing the page
+                window.history.pushState = function(){
+                    window.history.replaceState.apply(this, arguments);
+                    prop.resolve(location.pathname);
+                };
+                
+                prop.listenTo(prop.lastSet, function(newVal){
+                    var newURL = "/" + newVal.replace("/", "");
+                    window.history.replaceState( null, null, newURL );
+                    prop.resolve(location.pathname);
+                });
+                
+                // creating default pathname
+                window.history.replaceState( null, null, '/' );
+                prop.resolve(window.location.pathname);
+                
+                return function() {
+                    // resetting pushState to original function
+                    window.history.pushState = pushState;
+                }
+            }
         },
         url: {
             value(prop) {
