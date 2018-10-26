@@ -75,12 +75,6 @@ Component.extend({
                     prop.resolve(location.pathname);
                 };
                 
-                prop.listenTo(prop.lastSet, function(newVal){
-                    var newURL = "/" + newVal.replace("/", "");
-                    window.history.replaceState( null, null, newURL );
-                    prop.resolve(location.pathname);
-                });
-                
                 // creating default pathname
                 window.history.replaceState( null, null, '/' );
                 prop.resolve(window.location.pathname);
