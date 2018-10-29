@@ -21,6 +21,7 @@ mock-url .url .base {
 	flex-shrink: 0;
 	line-height: 24px;
 	padding: 1px 0px;
+  position: relative;
 }
 mock-url .input {
 	flex-grow: 1;
@@ -43,7 +44,9 @@ mock-url input {
 	background-color: #efefef;
 	width: 100%;
 }
-
+mock-url .url .base .path {
+	width: inherit;
+}
 `;
 
 document.body.appendChild(style);
@@ -56,7 +59,11 @@ Component.extend({
 			<span class='forward' on:click='forward()'>&#x21E8;</span>
 			<span class='reload' on:click='reload()'>&#8635;</span>
 			<div class="url">
-				<span class='base'>URL:{{page}}{{path}}</span>
+				<span class='base'>URL:{{page}}
+					{{# if (pushstate) }}
+						<input class='path' value:bind="path"/>
+					{{/ if}}
+				</span>
 				<span class='input'><input value:bind="url" placeholder="#! The hash is empty"/></span>
 			</div>
 		</div>
@@ -66,7 +73,8 @@ Component.extend({
 			default: "/my-app.html"
 		},
 		pushstate: {
-			default: false
+			default: false,
+			type: "boolean"
 		},
 		path: {
 			value(prop) {
@@ -83,6 +91,11 @@ Component.extend({
 					window.history.replaceState.apply(this, arguments);
 					prop.resolve(location.pathname);
 				};
+        
+				prop.listenTo(prop.lastSet, function(newVal){	
+					var newURL = "/" + newVal.replace("/", "");	
+					window.history.pushState( null, null, newURL );
+				});
 				
 				// creating default pathname
 				window.history.replaceState( null, null, '/' );
