@@ -1,4 +1,4 @@
-import { Component, DefineMap, stache } from "//unpkg.com/can@5/core.mjs";
+import { Component, DefineMap, stache } from "can";
 
 var style = document.createElement("style");
 style.innerHTML = `
@@ -65,8 +65,17 @@ Component.extend({
         page: {
             default: "/my-app.html"
         },
+        pushstate: {
+            default: false
+        },
         path: {
             value(prop) {
+                // if pushstate's value isn't changed exit function resolving null.
+                if (!this.pushstate) {
+                    prop.resolve(null);
+                    return;
+                }
+
                 var pushState = window.history.pushState;
                 
                 // prevent history.pushState from refreshing the page
