@@ -85,26 +85,43 @@ Component.extend({
 				}
 
 				var pushState = window.history.pushState;
-				
-				// prevent history.pushState from refreshing the page
-				window.history.pushState = function(){
-					window.history.replaceState.apply(this, arguments);
+				var replaceState = window.history.replaceState;
+
+				// listen to replaceState
+				window.history.replaceState = function(){
+					replaceState.apply(this, arguments);
 					prop.resolve(location.pathname);
 				};
-        
+
+				// listen to pushState
+				window.history.pushState = function(){
+					pushState.apply(this, arguments);
+					prop.resolve(location.pathname);
+				};
+
 				prop.listenTo(prop.lastSet, function(newVal){	
 					var newURL = "/" + newVal.replace("/", "");	
-					window.history.pushState( null, null, newURL );
+					window.history.replaceState( null, null, newURL );
 				});
 				
 				// creating default pathname
 				window.history.replaceState( null, null, '/' );
-				prop.resolve(window.location.pathname);
 				
+				// listen to history.back() and history.forward()
+				window.onpopstate = function() {
+					setTimeout( function(){
+						prop.resolve(location.pathname);
+					}, 100 );
+				};
+				
+				// teardown
 				return function() {
-					// resetting pushState to original function
+					// reset pushState and replaceState
 					window.history.pushState = pushState;
-				}
+					window.hisogry.replaceState = replaceState;
+					// clear onpopstate handler
+					window.onpopstate = () => {};
+				};
 			}
 		},
 		url: {
