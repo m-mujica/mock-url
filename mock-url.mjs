@@ -26,7 +26,7 @@ mock-url .url .base {
 mock-url .input {
 	flex-grow: 1;
 }
-mock-url .back, mock-url .forward, mock-url .reload {
+mock-url .back, mock-url .forward {
 	font-size: 20px;
 	font-family: Verdana,sans-serif;
 	border: solid 1px black;
@@ -35,7 +35,7 @@ mock-url .back, mock-url .forward, mock-url .reload {
 	flex-grow: 0;
 	cursor: pointer;
 }
-mock-url .back:hover, mock-url .forward:hover, mock-url .reload:hover, mock-url input:hover {
+mock-url .back:hover, mock-url .forward:hover, mock-url input:hover {
 	background-color: #ADD8E6;
 }
 mock-url input {
@@ -44,7 +44,7 @@ mock-url input {
 	background-color: #efefef;
 	width: 100%;
 }
-mock-url .url .base .path {
+mock-url .url .base {
 	width: inherit;
 }
 `;
@@ -57,20 +57,26 @@ Component.extend({
 		<div class='location'>
 			<span class='back' on:click='back()'>&#x21E6;</span>
 			<span class='forward' on:click='forward()'>&#x21E8;</span>
-			<span class='reload' on:click='reload()'>&#8635;</span>
 			<div class="url">
-				<span class='base'>URL:{{page}}
-					{{# if (pushstate) }}
-						<input class='path' value:bind="path"/>
-					{{/ if}}
+				<span class='base'>{{page}}</span>
+				<span class='input'>
+				{{# if (pushstate) }}
+					<input value:bind="path"/>
+				{{ else }}
+					<input value:bind="url" placeholder="#! The hash is empty"/>
+				{{/ if }}
 				</span>
-				<span class='input'><input value:bind="url" placeholder="#! The hash is empty"/></span>
 			</div>
 		</div>
 	`,
-	ViewModel: DefineMap.extend("MockUrl",{
+	ViewModel: DefineMap.extend("MockUrl", {
 		page: {
-			default: "/my-app.html"
+			default() {
+				if (this.pushstate) {
+					return "https://foo.com";
+				}
+				return "/my-app.html";
+			}
 		},
 		pushstate: {
 			default: false,
@@ -98,9 +104,10 @@ Component.extend({
 					pushState.apply(this, arguments);
 					prop.resolve(location.pathname);
 				};
-
-				prop.listenTo(prop.lastSet, function(newVal){	
-					var newURL = "/" + newVal.replace("/", "");	
+        
+				// handle input
+				prop.listenTo(prop.lastSet, function(newVal){
+					var newURL = newVal.replace("/", "");	
 					window.history.replaceState( null, null, newURL );
 				});
 				
@@ -109,7 +116,7 @@ Component.extend({
 				
 				// listen to history.back() and history.forward()
 				window.onpopstate = function() {
-					setTimeout( function(){
+					setTimeout( function() {
 						prop.resolve(location.pathname);
 					}, 100 );
 				};
@@ -151,9 +158,6 @@ Component.extend({
 		},
 		forward() {
 			history.forward();
-		},
-		reload() {
-			location.reload();
 		}
 	})
 });
