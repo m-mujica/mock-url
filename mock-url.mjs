@@ -106,9 +106,8 @@ Component.extend({
 				};
         
 				// handle input
-				prop.listenTo(prop.lastSet, function(newVal){
-					var newURL = newVal.replace("/", "");	
-					window.history.replaceState( null, null, newURL );
+				prop.listenTo(prop.lastSet, function(newVal) {
+					window.history.replaceState( null, null, newVal );
 				});
 				
 				// creating default pathname
