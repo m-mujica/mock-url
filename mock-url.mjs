@@ -84,7 +84,7 @@ Component.extend({
 		},
 		path: {
 			value(prop) {
-				// if pushstate's value isn't changed exit function resolving null.
+				// if pushstate's value isn't changed exit function
 				if (!this.pushstate) {
 					prop.resolve(null);
 					return;
@@ -93,40 +93,42 @@ Component.extend({
 				var pushState = window.history.pushState;
 				var replaceState = window.history.replaceState;
 
-				// listen to replaceState
-				window.history.replaceState = function(){
-					replaceState.apply(this, arguments);
-					prop.resolve(location.pathname);
-				};
-
 				// listen to pushState
 				window.history.pushState = function(){
 					pushState.apply(this, arguments);
-					prop.resolve(location.pathname);
+					prop.resolve(location.pathname + window.location.hash);
+				};
+				
+				// listen to replaceState
+				window.history.replaceState = function(){
+					replaceState.apply(this, arguments);
+					prop.resolve(location.pathname + window.location.hash);
 				};
         
 				// handle input
 				prop.listenTo(prop.lastSet, function(newVal) {
-					window.history.replaceState( null, null, newVal );
+					window.history.pushState( null, null, newVal );
 				});
 				
 				// creating default pathname
 				window.history.replaceState( null, null, '/' );
 				
+				
 				// listen to history.back() and history.forward()
-				window.onpopstate = function() {
-					setTimeout( function() {
-						prop.resolve(location.pathname);
-					}, 100 );
-				};
+				function popStateHandler() {
+					setTimeout(function() {
+						prop.resolve(location.pathname + window.location.hash);
+					}, 100);
+				}
+				window.addEventListener("popstate", popStateHandler);
 				
 				// teardown
 				return function() {
 					// reset pushState and replaceState
 					window.history.pushState = pushState;
-					window.hisogry.replaceState = replaceState;
-					// clear onpopstate handler
-					window.onpopstate = () => {};
+					window.history.replaceState = replaceState;
+					// clear remove popStateHandler listener
+					window.removeEventListener("popstate", popStateHandler);
 				};
 			}
 		},
@@ -147,9 +149,9 @@ Component.extend({
 				prop.resolve(window.location.hash);
 
 				// teardown
-				return function(){
+				return function() {
 					window.removeEventListener("hashchange", updateWithHash);
-				}
+				};
 			}
 		},
 		back() {
