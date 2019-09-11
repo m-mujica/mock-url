@@ -1,4 +1,4 @@
-import { Component, DefineMap, stache } from "//unpkg.com/can@pre/core.mjs";
+import { StacheElement, stache } from "//unpkg.com/can@pre/core.mjs";
 
 var style = document.createElement("style");
 style.innerHTML = `
@@ -51,14 +51,13 @@ mock-url .url .base {
 
 document.body.appendChild(style);
 
-Component.extend({
-	tag: "mock-url",
-	view: `
+export default class MockUrl extends StacheElement {
+	static view = `
 		<div class='location'>
 			<span class='back' on:click='back()'>&#x21E6;</span>
 			<span class='forward' on:click='forward()'>&#x21E8;</span>
 			<div class="url">
-				<span class='base'>{{page}}</span>
+				<span class='base'>{{ page }}</span>
 				<span class='input'>
 				{{# if (pushstate) }}
 					<input value:bind="path"/>
@@ -68,10 +67,10 @@ Component.extend({
 				</span>
 			</div>
 		</div>
-	`,
-	ViewModel: DefineMap.extend("MockUrl", {
+	`;
+	static props = {
 		page: {
-			default() {
+			get default() {
 				if (this.pushstate) {
 					return "https://foo.com";
 				}
@@ -80,7 +79,7 @@ Component.extend({
 		},
 		pushstate: {
 			default: false,
-			type: "boolean"
+			type: Boolean
 		},
 		path: {
 			value(prop) {
@@ -154,11 +153,12 @@ Component.extend({
 				};
 			}
 		},
-		back() {
-			history.back();
-		},
-		forward() {
-			history.forward();
-		}
-	})
-});
+	};
+	back() {
+		history.back();
+	};
+	forward() {
+		history.forward();
+	}
+};
+customElements.define("mock-url", MockUrl);
