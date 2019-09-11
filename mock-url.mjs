@@ -1,4 +1,4 @@
-import { Component, DefineMap, stache } from "//unpkg.com/can@5/core.mjs";
+import { Component, DefineMap, stache } from "//unpkg.com/can@pre/core.mjs";
 
 var style = document.createElement("style");
 style.innerHTML = `
